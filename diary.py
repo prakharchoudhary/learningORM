@@ -51,18 +51,25 @@ def view_entries(search_query=None):
     entries = Entry.select().order_by(Entry.timestamp.desc())
     if search_query:
         entries = entries.where(Entry.content.contains(search_query))
-    
+    	#SQL query equivalent: SELECT * FROM entry WHERE content LIKE '%search_query%'
+    	#ORDER BY timestamp DESC 
+
     for entry in entries:
         timestamp = entry.timestamp.strftime('%A %B %d, %Y %I:%M%p')
         print(timestamp)
         print('='*len(timestamp))
         print(entry.content)
         print('n) next entry')
+        print('d) delete entry')
         print('q) return to main menu')
         
-        next_action = raw_input('Action: [Nq] ').lower().strip()
+        next_action = raw_input('Action: [Ndq] ').lower().strip()
         if next_action == 'q':
-        	break	
+        	break
+
+       	if next_action == 'd':
+       		delete_entry(entry)	
+
    	print('='*len(timestamp))
 def search_entries():
     """Search entries for a string."""
@@ -70,6 +77,9 @@ def search_entries():
 
 def delete_entry(entry):
 	"""delete the selected entry"""
+	if raw_input("Are you sure you want to delete? [yN]: ").lower() == 'y':
+		entry.delete_instance()	
+		print("Entry deleted!")	
 
 menu = OrderedDict([
 	('a', add_entry),
